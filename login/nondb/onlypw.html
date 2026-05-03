@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <style>
+        /* 기본 스타일 및 배경 */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+            background-color: #333; /* 이미지 로딩 전 기본 배경색 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        /* 중앙 반투명 박스 (Glassmorphism) */
+        .login-box {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 320px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+            text-align: center;
+        }
+
+        .login-box h1 {
+            margin: 0 0 30px 0;
+            color: #ffffff;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* 입력란 */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            color: #333;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input::placeholder {
+            color: #666;
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* 버튼 */
+        .btn-auth {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4CAF50; /* 초기 기본 색상 */
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .btn-auth:hover {
+            background-color: #45a049;
+        }
+
+        /* 배경 밝기에 따른 버튼 동적 테마 */
+        .btn-auth.theme-light-bg {
+            background-color: #000000;
+            color: #ffffff;
+        }
+        .btn-auth.theme-light-bg:hover {
+            background-color: #333333;
+        }
+
+        .btn-auth.theme-dark-bg {
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .btn-auth.theme-dark-bg:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* 로그인 유지 버튼 */
+        .keep-login-text {
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            display: inline-block;
+            transition: color 0.3s;
+        }
+
+        .keep-login-text:hover {
+            color: #f0f0f0;
+        }
+
+        .keep-status {
+            font-size: 12px;
+            color: #e0e0e0;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* 모달 팝업 (로그인 유지 기간 선택 및 알림창 공용) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 280px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: popIn 0.3s ease-out;
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-6m { background-color: #2196F3; color: white; }
+        .btn-6m:hover { background-color: #1976D2; }
+        
+        .btn-inf { background-color: #9C27B0; color: white; }
+        .btn-inf:hover { background-color: #7B1FA2; }
+
+        .btn-close { background-color: #f44336; color: white; margin-top: 20px; }
+        .btn-close:hover { background-color: #d32f2f; }
+
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h1>샘플</h1>
+        <div class="input-group">
+            <input type="password" id="keyInput" placeholder="비밀번호를 입력하세요">
+        </div>
+        <button class="btn-auth" onclick="authenticate()">인증</button>
+        
+        <span class="keep-login-text" onclick="openKeepLoginModal()">로그인 유지 설정</span>
+        <span class="keep-status" id="keepStatusText">현재 설정: 없음</span>
+    </div>
+
+    <!-- 로그인 유지 기간 선택 모달 -->
+    <div class="modal-overlay" id="keepLoginModal">
+        <div class="modal-content">
+            <h3>로그인 유지 기간 선택</h3>
+            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">원하시는 유지 기간을 선택해주세요.</p>
+            <button class="modal-btn btn-6m" onclick="setKeepLogin('6m')">6개월 뒤</button>
+            <button class="modal-btn btn-inf" onclick="setKeepLogin('inf')">무한</button>
+            <button class="modal-btn btn-close" onclick="closeModal('keepLoginModal')" style="background:#e0e0e0; color:#333;">취소</button>
+        </div>
+    </div>
+
+    <!-- 커스텀 알림 메시지 모달 -->
+    <div class="modal-overlay" id="messageModal">
+        <div class="modal-content">
+            <h3 id="messageTitle">알림</h3>
+            <p id="messageText" style="font-size: 14px; color: #333; margin-bottom: 20px; word-break: keep-all;"></p>
+            <button class="modal-btn btn-close" onclick="closeModal('messageModal')">확인</button>
+        </div>
+    </div>
+
+    <script>
+        // 성공 시 이동할 URL (원하시는 주소로 변경하세요)
+        const TARGET_URL = "https://www.google.com";
+        
+        // 배경으로 사용할 이미지 URL (원하시는 URL로 변경하세요)
+        const BG_IMAGE_URL = "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=1920&auto=format&fit=crop"; 
+        
+        // 로그인 유지 기간 상태 변수
+        let selectedKeepDuration = null; 
+
+        // 1. 페이지 로드 시 로그인 유지 상태 확인 및 배경/버튼색상 설정
+        window.onload = function() {
+            checkAutoLogin();
+            applyDynamicBackground(BG_IMAGE_URL);
+        };
+
+        function applyDynamicBackground(url) {
+            document.body.style.backgroundImage = `url('${url}')`;
+
+            const img = new Image();
+            img.crossOrigin = "Anonymous"; // CORS 권한 요청 (밝기 계산용)
+            img.src = url;
+
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                try {
+                    // 이미지 데이터 추출 및 밝기 분석
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    let colorSum = 0;
+                    
+                    // 성능 최적화를 위해 간격을 두고 픽셀 샘플링
+                    const step = 4 * 10; 
+                    let count = 0;
+                    for (let x = 0, len = data.length; x < len; x += step) {
+                        const r = data[x];
+                        const g = data[x+1];
+                        const b = data[x+2];
+                        const brightness = (r * 299 + g * 587 + b * 114) / 1000; // 상대 밝기 공식
+                        colorSum += brightness;
+                        count++;
+                    }
+                    const avgBrightness = Math.floor(colorSum / count);
+                    
+                    const btn = document.querySelector('.btn-auth');
+                    
+                    // 밝기가 기준치(128) 미만이면 어두운 테마, 이상이면 밝은 테마
+                    if (avgBrightness < 128) {
+                        btn.classList.add('theme-dark-bg');
+                    } else {
+                        btn.classList.add('theme-light-bg');
+                    }
+                } catch(e) {
+                    console.log("CORS 제한으로 이미지 밝기를 계산할 수 없습니다. 기본값(어두운 테마)을 적용합니다.");
+                    document.querySelector('.btn-auth').classList.add('theme-dark-bg');
+                }
+            };
+        }
+
+        function checkAutoLogin() {
+            const sessionData = localStorage.getItem('sample_login_session');
+            if (sessionData) {
+                const session = JSON.parse(sessionData);
+                const now = new Date().getTime();
+
+                // 무한이거나 아직 만료시간 전이라면 자동 로그인 처리
+                if (session.expires === 'infinite' || session.expires > now) {
+                    window.location.href = TARGET_URL;
+                } else {
+                    // 기간 만료
+                    localStorage.removeItem('sample_login_session');
+                }
+            }
+        }
+
+        // 2. 모달 제어 함수
+        function openKeepLoginModal() {
+            document.getElementById('keepLoginModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showMessage(msg, title = "알림") {
+            document.getElementById('messageTitle').innerText = title;
+            document.getElementById('messageText').innerText = msg;
+            document.getElementById('messageModal').style.display = 'flex';
+        }
+
+        // 3. 로그인 유지 설정 저장
+        function setKeepLogin(type) {
+            selectedKeepDuration = type;
+            const statusText = document.getElementById('keepStatusText');
+            if(type === '6m') {
+                statusText.innerText = "현재 설정: 6개월 유지";
+            } else if(type === 'inf') {
+                statusText.innerText = "현재 설정: 무한 유지";
+            }
+            closeModal('keepLoginModal');
+        }
+
+        // 4. 인증 (로그인 로직)
+        function authenticate() {
+            const keyInput = document.getElementById('keyInput').value.trim();
+
+            if (!keyInput) {
+                showMessage("비밀번호를 입력해주세요.");
+                return;
+            }
+
+            // 같은 디렉토리의 key.xml 파일을 불러옴
+            fetch('key.xml')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('파일을 찾을 수 없습니다.');
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    // 텍스트를 줄바꿈 단위로 나누고 양옆 공백 제거
+                    const lines = text.split('\n').map(line => line.trim());
+                    
+                    // 사용자가 입력한 키가 파일의 라인 중 하나와 일치하는지 확인
+                    if (lines.includes(keyInput)) {
+                        handleLoginSuccess();
+                    } else {
+                        showMessage("일치하는 비밀번호가 없습니다.\n다시 확인해주세요.");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showMessage("파일을 읽어오는데 실패했습니다.\n웹 서버(Localhost) 환경에서 실행중인지 확인해주세요.");
+                });
+        }
+
+        // 5. 로그인 성공 처리
+        function handleLoginSuccess() {
+            // 로그인 유지 설정에 따라 localStorage에 데이터 저장
+            if (selectedKeepDuration) {
+                let expireTime;
+                
+                if (selectedKeepDuration === '6m') {
+                    // 6개월 = 대략 180일
+                    const days = 180;
+                    expireTime = new Date().getTime() + (days * 24 * 60 * 60 * 1000);
+                } else if (selectedKeepDuration === 'inf') {
+                    expireTime = 'infinite';
+                }
+
+                localStorage.setItem('sample_login_session', JSON.stringify({
+                    isLoggedIn: true,
+                    expires: expireTime
+                }));
+            } else {
+                // 로그인 유지를 선택하지 않은 경우 세션만 유지하게 만들수도 있으나
+                // 현재는 html 단일 페이지이므로 localStorage에 임시 저장 후 바로 지워지는 방식등이 필요합니다.
+                // 여기서는 유지를 안할 시 저장하지 않습니다.
+            }
+
+            // 지정된 URL로 이동
+            window.location.href = TARGET_URL;
+        }
+    </script>
+</body>
+</html>
