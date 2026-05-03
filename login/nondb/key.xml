@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<accounts>
+    admin:1234
+    testuser:password
+    hello:world123
+    user01:pw0101
+</accounts>
